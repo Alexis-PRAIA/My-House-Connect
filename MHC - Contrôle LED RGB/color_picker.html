@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palette de Couleurs avec Sélecteur</title>
+</head>
+
+<body>
+
+    <h2>Sélectionnez une Couleur</h2>
+
+    <!-- Intégration du sélecteur de couleur -->
+    <input type="color" id="colorPicker" value="#000000">
+
+    <div>
+        <h3>Aperçu de la Couleur</h3>
+        <div id="colorPreview" style="width: 50px; height: 50px; border: 1px solid #ffffff00;"></div>
+
+        <h3>Code RGB</h3>
+        <div id="rgbCode"></div>
+    </div>
+
+    <script>
+        // Code JavaScript pour mettre à jour l'aperçu de la couleur et le code RGB
+        const colorPicker = document.getElementById('colorPicker');
+        const colorPreview = document.getElementById('colorPreview');
+        const rgbCode = document.getElementById('rgbCode');
+
+        // Fonction pour convertir la valeur hexadécimale en composantes RGB
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.substring(1), 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return `${r},${g},${b}`;
+        }
+
+        // Fonction pour mettre à jour l'aperçu de la couleur et le code RGB
+        function updateColor() {
+            const selectedColor = colorPicker.value;
+            colorPreview.style.backgroundColor = selectedColor;
+
+            // Convertir la valeur hexadécimale en code RGB et l'afficher
+            const rgbValue = hexToRgb(selectedColor);
+            rgbCode.textContent = `RGB: ${rgbValue}`;
+
+            // Conversion des données en JSON
+            const jsonData = JSON.stringify(rgbValue);
+
+            // URL de votre script PHP
+            const url = 'script.php';
+
+            // Utilisation de la méthode Fetch avec la requête GET
+            fetch(`${url}?data=${encodeURIComponent(jsonData)}`, {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Traitement de la réponse depuis PHP
+                    console.log('R:', data.r);
+                    console.log('G:', data.g);
+                    console.log('B:', data.b);
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la requête fetch:', error);
+                });
+        }
+
+        // Appeler la fonction updateColor au chargement de la page
+        updateColor();
+
+
+        // Événement de changement de couleur
+        colorPicker.addEventListener('input', updateColor);
+
+    </script>
+</body>
+
+</html>
